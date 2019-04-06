@@ -7,10 +7,10 @@ urls = {
     "home" : 'https://shadowverse-portal.com/',
     "list" : 'https://shadowverse-portal.com/cards?format=%s&lang=%s',
 }
-cardsFileName = 'cards.list'
+cardsFileName = 'list.tmp'
 
 def fetchAndSaveCardList(format=1, lang='en'):
-    ### Card List Homepage
+    ### fetch Card List from Homepage
     ### format: 1: Rotation, 3: Unlimited
     ### lang: same as card
     cardIDList = []
@@ -26,7 +26,12 @@ def fetchAndSaveCardList(format=1, lang='en'):
 
     return cardIDList
 
-def getCardList(format=1, lang='en'):
+def getCardList(format=1, lang='en', forceFetch=False):
+    # force fetch the latest from web
+    if forceFetch:
+        return fetchAndSaveCardList(format, lange)
+
+    # fetch from local first, more for testing
     cards = [];
     try:
         with open(cardsFileName, 'rb') as f:

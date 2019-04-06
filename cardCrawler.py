@@ -6,13 +6,11 @@ urls = {
     "card": "https://shadowverse-portal.com/card/%s?lang=%s"
 };
 
-class Card:
-    pass
-
 class CardCrawler:
     def __init__(self, cid, lang):
         self.cid = cid
         self.lang = lang
+        self.relativeCards = []
 
     @property
     def mainSoup(self):
@@ -45,7 +43,8 @@ class CardCrawler:
 
     @property
     def relativeSoup(self):
-        return [(card.mainSoup, card.infoSoup) for card in self.relativeCards]
+        #return [(card.mainSoup, card.infoSoup) for card in self.relativeCards]
+        return self.relativeCards
 
     @relativeSoup.setter
     def relativeSoup(self, soup):
