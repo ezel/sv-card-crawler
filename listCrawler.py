@@ -29,7 +29,7 @@ def fetchAndSaveCardList(format=1, lang='en'):
 def getCardList(format=1, lang='en', forceFetch=False):
     # force fetch the latest from web
     if forceFetch:
-        return fetchAndSaveCardList(format, lange)
+        return fetchAndSaveCardList(format, lang)
 
     # fetch from local first, more for testing
     cards = [];

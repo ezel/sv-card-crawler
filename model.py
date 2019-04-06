@@ -44,10 +44,10 @@ class Card(Model):
         )
 
     @staticmethod
-    def checkExist(cid, lang):
+    def checkNotExist(cid, lang='en'):
         if None == Card.get_or_none(cid=cid, language=lang):
-            return False
-        return True
+            return True
+        return False
 
     @classmethod
     def createFromCrawler(cls, crawler, parent=None):
@@ -99,9 +99,3 @@ class Card(Model):
 # main test
 if __name__ == "__main__":
     SqliteDatabase('cards.db').create_tables([Card])
-    testCard1 = fetchSingleCard(109623010);
-    Card.createFromCrawler(testCard1)
-    testCard2 = fetchSingleCard(111041010);
-    Card.createFromCrawler(testCard2)
-    testCard3 = fetchSingleCard(100011010);
-    Card.createFromCrawler(testCard3)
