@@ -1,5 +1,7 @@
 from peewee import *
 
+db = SqliteDatabase('cards.db')
+
 class Card(Model):
     cid = CharField()
     language = CharField()
@@ -38,7 +40,7 @@ class Card(Model):
     mainCard = ForeignKeyField('self', backref='subCards', null=True)
 
     class Meta:
-        database = SqliteDatabase('cards.db')
+        database = db
         indexes = (
             (('cid', 'language'), True),
         )
@@ -95,6 +97,8 @@ class Card(Model):
 
         return mainCard
 
+def init_tables():
+    db.create_tables([Card])
 
 # main test
 if __name__ == "__main__":
