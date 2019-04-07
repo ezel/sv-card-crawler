@@ -54,12 +54,12 @@ class CardCrawler:
         rCard_ids = [atag['href'][6:] for atag in atags]
         # call fetchSingleCard rescurively
         for cid in rCard_ids:
-            self.relativeCards.append(fetchSingleCard(cid, self.lang));
+            self.relativeCards.append(fetchSingleCard(cid, self.lang, isSubCard=True));
 
     def exportCard(self):
         return self;
 
-def fetchSingleCard(card_id, lang='en'):
+def fetchSingleCard(card_id, lang='en', isSubCard=False):
     ### return the Card obj which generator by the CardCrawler::exportCard
     ###
 
@@ -77,9 +77,10 @@ def fetchSingleCard(card_id, lang='en'):
     c.infoSoup = cardSoup.find("div", class_="card-info")
 
     # fetch Relative Cards
-    relativeSoup = soup.find("div", class_="card-relative")
-    if relativeSoup:
-        c.relativeSoup = relativeSoup
+    if not isSubCard:
+        relativeSoup = soup.find("div", class_="card-relative")
+        if relativeSoup:
+            c.relativeSoup = relativeSoup
 
     return c.exportCard();
 
