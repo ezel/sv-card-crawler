@@ -32,7 +32,7 @@ class Card(Model):
     traitInfo = CharField()
     classInfo = CharField()
     rarityInfo = CharField()
-    createInfo = CharField()
+    createInfo = IntegerField()
     liquefyInfo = CharField()
     cardPackInfo = CharField()
 
@@ -78,7 +78,10 @@ class Card(Model):
             mainCard.traitInfo = infoSoup[0][1]
             mainCard.classInfo = infoSoup[1][1]
             mainCard.rarityInfo = infoSoup[2][1]
-            mainCard.createInfo = infoSoup[3][1]
+            if infoSoup[3][1] == '-':
+                mainCard.createInfo = 0
+            else:
+                mainCard.createInfo = int(infoSoup[3][1].replace(',',''))
             mainCard.liquefyInfo = infoSoup[4][1]
             mainCard.cardPackInfo = infoSoup[5][1]
             return mainCard;
