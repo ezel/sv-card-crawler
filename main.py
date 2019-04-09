@@ -1,6 +1,6 @@
 from listCrawler import getCardList
 from cardCrawler import fetchSingleCard
-from imageCrawler import updateCardImage
+from imageCrawler import updateCardImage, init_directory
 from model import Card, init_tables
 from concurrent.futures import ThreadPoolExecutor
 
@@ -18,6 +18,7 @@ parser.add_argument("-f","--forceFetch", action="store_true",
 args = parser.parse_args()
 
 if __name__ == "__main__":
+    init_directory()
     init_tables()
     lang = args.language
     currentList = getCardList(args.mode, forceFetch=args.forceFetch)
