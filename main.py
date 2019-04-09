@@ -1,7 +1,8 @@
 from listCrawler import getCardList
 from cardCrawler import fetchSingleCard
-from imageCrawler import downloadAllCardsImages
+from imageCrawler import updateCardImage
 from model import Card, init_tables
+from concurrent.futures import ThreadPoolExecutor
 
 import argparse
 
@@ -20,9 +21,14 @@ if __name__ == "__main__":
     init_tables()
     lang = args.language
     currentList = getCardList(args.mode, forceFetch=args.forceFetch)
-    for cid in currentList:
-        if Card.checkNotExist(cid, lang):
-            currentCard = fetchSingleCard(cid)
-            newCard = Card.createFromCrawler(currentCard)
+    with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
+        for cid in currentList:
+            if Card.checkNotExist(cid, lang):
+                future = executor.submit(lambda c, l : Card.createFromCrawler(fetchSingleCard(c,l)), cid, lang)
+                # newCard = future.result()
+    print('Finish fetching Card; Start downloading images...')
 
-    downloadAllCardsImages(args.maxWorkers)
+    with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
+         for c in Card.select().where( Card.imageLink1 == None ):
+             future = executor.submit(updateCardImage, c)
+    print('Complete downloading images.')
