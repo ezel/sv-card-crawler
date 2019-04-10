@@ -21,7 +21,7 @@ if __name__ == "__main__":
     init_directory()
     init_tables()
     lang = args.language
-    currentList = getCardList(args.mode, forceFetch=args.forceFetch)
+    currentList = getCardList(args.mode, lang=lang, forceFetch=args.forceFetch)
     with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
         for cid in currentList:
             if Card.checkNotExist(cid, lang):

@@ -58,7 +58,7 @@ def fetchCardListOfURL(url):
 
     # find next
     paginationSoup = soup.find("div", class_="bl-pagination")
-    nextHref = [ a['href'] for a in paginationSoup.find_all('a') if a.text == 'next']
+    nextHref = [ span.a['href'] for span in paginationSoup.find_all('span') if 'is-next' in span['class']]
     if len(nextHref) > 0:
         nextURL = urls['main'] + nextHref[0]
     else:
