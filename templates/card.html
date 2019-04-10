@@ -1,0 +1,19 @@
+<h1>Card</h1>
+<h1>{% for c in cards %}<span class="cd-title">{{ c.title }}</span> {% endfor %}</h1>
+<img class="cd-image" src="{{ url_for('static', filename='images'+cards[0].imageLink1) }}">
+{% for c in cards %}<p class="cd-skill">{{ c.skill1 }}</p>{% endfor %}
+{% for c in cards %}<p class="cd-desp">{{ c.desp1 }}</p>{% endfor %}
+{% if cards[0].skill2 %}
+<img class="cd-image" src="{{ url_for('static', filename='images'+cards[0].imageLink1) }}">
+{% for c in cards %}<p class="cd-skill">{{ c.skill2 }}</p>{% endfor %}
+{% for c in cards %}<p class="cd-desp">{{ c.desp2 }}</p>{% endfor %}
+{% endif %}
+<h2>Info</h2>
+<ul>
+	<li>Trait: {{ cards[0].traitInfo }}</li>
+	<li>Class: {% for c in cards %} {{ c.classInfo }} / {% endfor %}</li>
+	<li>Rarity: {{ cards[0].rarityInfo }}</li>
+	<li>Create: {{ cards[0].createInfo }}</li>
+	<li>Liquefy: {{ cards[0].liquefyInfo }}</li>
+	<li>Card Pack: {% for c in cards %} {{ c.cardPackInfo }} / {% endfor %}</li>
+</ul>
