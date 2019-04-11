@@ -1,19 +1,32 @@
+<style>
+	table.cd-detail img {
+		width: 100%;
+	}
+</style>
+
 <h1>Card</h1>
-<h1>{% for c in cards %}<span class="cd-title">{{ c.title }}</span> {% endfor %}</h1>
-<img class="cd-image" src="{{ url_for('static', filename='images'+cards[0].imageLink1) }}">
-{% for c in cards %}<p class="cd-skill">{{ c.skill1 }}</p>{% endfor %}
-{% for c in cards %}<p class="cd-desp">{{ c.desp1 }}</p>{% endfor %}
-{% if cards[0].skill2 %}
-<img class="cd-image" src="{{ url_for('static', filename='images'+cards[0].imageLink1) }}">
-{% for c in cards %}<p class="cd-skill">{{ c.skill2 }}</p>{% endfor %}
-{% for c in cards %}<p class="cd-desp">{{ c.desp2 }}</p>{% endfor %}
-{% endif %}
-<h2>Info</h2>
-<ul>
-	<li>Trait: {{ cards[0].traitInfo }}</li>
-	<li>Class: {% for c in cards %} {{ c.classInfo }} / {% endfor %}</li>
-	<li>Rarity: {{ cards[0].rarityInfo }}</li>
-	<li>Create: {{ cards[0].createInfo }}</li>
-	<li>Liquefy: {{ cards[0].liquefyInfo }}</li>
-	<li>Card Pack: {% for c in cards %} {{ c.cardPackInfo }} / {% endfor %}</li>
-</ul>
+<table class="cd-info">
+	<tr>
+		<td colspan="3">Title</td>
+		<td>Trait</td>
+		<td>Class</td>
+		<td>Create: {{ card.createInfo }}</td>
+		<td>Liquefy: {{ card.liquefyInfo }}</td>
+	</tr>	
+	<tr>
+		<td class="cd-title">{{ card.title }}</td>
+		<td>{{ card.traitInfo }}</td>
+		<td>{{ card.classInfo }}</td>
+		<td>{{ card.cardPackInfo }}</td>
+	</tr>
+</table>
+<table class="cd-detail">
+	<tr>
+		<td rowspan="2"><img class="cd-image" src="{{ url_for('static', filename='images'+card.imageLink1) }}"></td>
+		<td><span class="cd-skill">{{ card.skill1 }}</span><br><span class="cd-desp">{{ card.desp1 }}</span><br></td>
+		<td rowspan="2">{% if card.Atk2 %}<img class="cd-image" src="{{ url_for('static', filename='images'+card.imageLink2) }}">{% endif %}</td>
+	</tr>
+	<tr>
+		<td>{% if card.Atk2 %}<span class="cd-skill">{{ card.skill2 }}</span><br><span class="cd-desp">{{ card.desp2 }}</span><br>{% endif %}</td>
+	</tr>
+</table>
