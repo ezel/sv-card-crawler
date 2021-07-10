@@ -1,6 +1,6 @@
 import requests
 import os
-from model import Card
+from module.model import Card
 
 img_path = "images"
 

@@ -1,7 +1,7 @@
-from listCrawler import getCardList
-from cardCrawler import fetchSingleCard
-from imageCrawler import updateCardImage, init_directory
-from model import Card, init_tables
+from module.listCrawler import getCardList
+from module.cardCrawler import fetchSingleCard
+from module.imageCrawler import updateCardImage, init_directory
+from module.model import Card, init_tables
 from concurrent.futures import ThreadPoolExecutor
 
 import argparse
