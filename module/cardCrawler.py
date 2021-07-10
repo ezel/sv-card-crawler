@@ -82,7 +82,7 @@ def fetchSingleCard(card_id, lang='en', isSubCard=False):
         if relativeSoup:
             c.relativeSoup = relativeSoup
 
-    return c.exportCard();
+    return c
 
 # test the Satan card
 if __name__ == "__main__":

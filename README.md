@@ -38,8 +38,6 @@ CREATE TABLE IF NOT EXISTS "card" ("id" INTEGER NOT NULL PRIMARY KEY, "cid" VARC
 ## TODO
 
 * ~~a gui to view card [maybe in a new project]~~
-* refactoring src/
 * a better UX usage
-* split metadata and images
-* compress images
+* compress/resize images
 * store images in database

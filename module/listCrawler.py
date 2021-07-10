@@ -11,6 +11,7 @@ cardsFileName = 'list.tmp'
 
 def fetchAndSaveCardList(format=1, lang='en'):
     ### fetch Card List from Homepage
+    # use the next page, so this function should be IO blocking
     ### format: 1: Rotation, 3: Unlimited
     ### lang: same as card
     cardIDList = []
