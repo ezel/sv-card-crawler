@@ -18,11 +18,11 @@ this will generate a cards.db file for sqlite3
 usage: main.py [-h] [-w MAXWORKERS] [-f] {1,3} {en,ja,zh-tw}
 
 positional arguments:
-  {1,3}                 game mode of the card: 1=Rotation, 3=Unlimit
-  {en,ja,zh-tw}         card language: en=english, ja=janpanse, zh-tw=traditional chinese
+  {1,3}                 game mode: 1=Rotation, 3=Unlimit, default=1
+  {en,ja,zh-tw}         card language: default=zh-tw
 
 optional arguments:
-  -h, --help            show this help message and exit
+  -h, --help            show this help message
   -w MAXWORKERS, --maxWorkers MAXWORKERS
                         the max concurrent workers when downling images
   -f, --forceFetch      wheather fetch from web or use local temp file

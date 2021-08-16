@@ -8,9 +8,9 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--mode", type=int, choices=[1,3], default=1,
-                    help="game mode of the card: 1=Rotation, 3=Unlimit, default=1")
-parser.add_argument("language", type=str, choices=['en','ja','zh-tw'], default='ja',
-                    help="card language: en=english, ja=janpanse, zh-tw=traditional chinese, default=ja")
+                    help="game mode: 1=Rotation, 3=Unlimit, default=1")
+parser.add_argument("language", type=str, choices=['en','ja','zh-tw'], default='zh-tw',
+                    help="card language: default=zh-tw")
 parser.add_argument("-w","--maxWorkers", type=int, default=20,
                     help="the max concurrent workers when downling images, default=20")
 parser.add_argument("-f","--forceFetch", action="store_true",
