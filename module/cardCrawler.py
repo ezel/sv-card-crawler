@@ -65,7 +65,7 @@ def fetchSingleCard(card_id, lang='en', isSubCard=False):
 
     # init
     c = CardCrawler(card_id, lang)
-    print("downloading card %s ..." % card_id)
+    print("downloading card %s in %s ..." % (card_id, lang))
     r = requests.get(urls['card'] % (card_id, lang))
     soup = BeautifulSoup(r.text, 'lxml')
 

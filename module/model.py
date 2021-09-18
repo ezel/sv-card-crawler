@@ -2,26 +2,66 @@ from peewee import *
 
 db = SqliteDatabase('cards.db')
 
+
+class Image(Model):
+    #card = ForeignKeyField(Card, null=True, field='card_id')
+    fname = CharField(primary_key=True)
+    imageURL = CharField() # save the URL of image
+    imageLink = CharField() # save the local link of image
+    data = BlobField(null=True)
+    compressed = BooleanField(default=False)
+
+    class Meta:
+        database = db
+
+    @staticmethod
+    def checkNotExist(fname):
+        if None == Image.get_or_none(fname=fname):
+            return True
+        return False
+
+
 class Card(Model):
-    cid = CharField()
-    language = CharField()
+    card_id = CharField(primary_key=True)
+    img1 = ForeignKeyField(Image, null=True)
+    img2 = ForeignKeyField(Image, null=True)
 
-    title = CharField()
-
-    imageURL1 = CharField() # save the URL of image
-    imageURL2 = CharField(null=True)
-
-    imageLink1 = CharField(null=True) # save the local link of image
-    imageLink2 = CharField(null=True)
-
-    # main abilities
     Atk1 = IntegerField(null=True)
     HP1 = IntegerField(null=True)
     Atk2 = IntegerField(null=True)
     HP2 = IntegerField(null=True)
 
-    # cost not on page
     minCost = IntegerField(null=True)
+    mainCard = ForeignKeyField('self', backref='subCards', null=True)
+
+    class Meta:
+        database = db
+
+    @classmethod
+    def fromCrawler(cls, crawler):
+        aCard = Card(card_id=crawler.cid)
+
+        # divide soup
+        mainSoup = crawler.mainSoup
+        infoSoup = crawler.infoSoup
+
+        # for image object
+        #fname =
+
+        # setter
+        aCard.img1 = mainSoup[1][0]
+        if len(mainSoup[1]) > 1:
+            aCard.img2 = mainSoup[1][1]
+            aCard.Atk2, aCard.HP2 = mainSoup[2][1]
+        if mainSoup[2]:
+            aCard.Atk1, aCard.HP1 = mainSoup[2][0]
+        return aCard
+
+
+class CardLanguageInfo(Model):
+    card = ForeignKeyField(Card, null=True, field='card_id')
+    language = CharField()
+    title = CharField()
 
     skill1 = TextField()
     skill2 = TextField(null=True)
@@ -36,73 +76,69 @@ class Card(Model):
     liquefyInfo = CharField()
     cardPackInfo = CharField()
 
-    # the relative card have a main card (parent)
-    mainCard = ForeignKeyField('self', backref='subCards', null=True)
-
     class Meta:
         database = db
-        indexes = (
-            (('cid', 'language'), True),
-        )
 
+    @classmethod
+    def fromCrawler(cls, crawler):
+        aInfo = CardLanguageInfo(card=crawler.cid)
+        # divide soup
+        mainSoup = crawler.mainSoup
+        infoSoup = crawler.infoSoup
+        # setter
+        aInfo.language = crawler.lang
+        aInfo.title = mainSoup[0]
+        aInfo.skill1 = mainSoup[3][0]
+        aInfo.desp1 = mainSoup[4][0]
+
+        # evlove
+        if len(mainSoup[1]) > 1:
+            aInfo.skill2 = mainSoup[3][1]
+            aInfo.desp2 = mainSoup[4][1]
+
+        aInfo.traitInfo = infoSoup[0][1]
+        aInfo.classInfo = infoSoup[1][1]
+        aInfo.rarityInfo = infoSoup[2][1]
+        if infoSoup[3][1] == '-':
+            aInfo.createInfo = 0
+        else:
+            aInfo.createInfo = int(infoSoup[3][1].replace(',',''))
+        aInfo.liquefyInfo = infoSoup[4][1]
+        aInfo.cardPackInfo = infoSoup[5][1]
+        return aInfo
+
+
+class CardWrapper():
     @staticmethod
     def checkNotExist(cid, lang='en'):
-        if None == Card.get_or_none(cid=cid, language=lang):
+        if None == Card.get_or_none(card_id=cid):
+            return True
+        elif None == CardLanguageInfo.get_or_none(card_id=cid, language=lang):
             return True
         return False
 
     @classmethod
-    def createFromCrawler(cls, crawler, parent=None):
-        # inner function to match card data from crawler warpper
-        def newMainCard(cls, crawler):
-            # get card soup
-            mainSoup = crawler.mainSoup
-            infoSoup = crawler.infoSoup
-
-            # init main card
-            mainCard = cls(cid=crawler.cid, language=crawler.lang)
-            mainCard.title = mainSoup[0]
-            mainCard.imageURL1 = mainSoup[1][0]
-            if mainSoup[2]:
-                mainCard.Atk1, mainCard.HP1 = mainSoup[2][0]
-            mainCard.skill1 = mainSoup[3][0]
-            mainCard.desp1 = mainSoup[4][0]
-
-            # evlove card
-            if len(mainSoup[1]) > 1:
-                mainCard.imageURL2 = mainSoup[1][1]
-                mainCard.Atk2, mainCard.HP2 = mainSoup[2][1]
-                mainCard.skill2 = mainSoup[3][1]
-                mainCard.desp2 = mainSoup[4][1]
-
-            mainCard.traitInfo = infoSoup[0][1]
-            mainCard.classInfo = infoSoup[1][1]
-            mainCard.rarityInfo = infoSoup[2][1]
-            if infoSoup[3][1] == '-':
-                mainCard.createInfo = 0
-            else:
-                mainCard.createInfo = int(infoSoup[3][1].replace(',',''))
-            mainCard.liquefyInfo = infoSoup[4][1]
-            mainCard.cardPackInfo = infoSoup[5][1]
-            return mainCard;
-
+    def importFromCrawler(cls, crawler, parent=None):
+        cid = crawler.cid
         # new main card
-        mainCard = newMainCard(cls, crawler)
-        mainCard.mainCard = parent
+        mainCard = Card.get_or_none(card_id=crawler.cid)
+        if None == mainCard:
+            mainCard = Card.fromCrawler(crawler)
+            mainCard.mainCard = parent
+            mainCard.save(force_insert=True)
 
-        # if not exist , create mainCard
-        if None == Card.get_or_none(cid=mainCard.cid, language=mainCard.language):
-            mainCard.save()
+        # new lang info
+        mainInfo = CardLanguageInfo.get_or_none(crawler.cid, language=crawler.lang)
+        if None == mainInfo:
+            mainInfo = CardLanguageInfo.fromCrawler(crawler)
+            mainInfo.save()
 
-            # sub cards
-            for subCrawler in crawler.relativeSoup:
-                Card.createFromCrawler(subCrawler, mainCard)
+        # sub cards
+        for subCrawler in crawler.relativeSoup:
+            CardWrapper.importFromCrawler(subCrawler, mainCard)
 
-        return mainCard
 
 def init_tables():
-    db.create_tables([Card])
+    db.create_tables([Card, CardLanguageInfo, Image])
 
-# main test
-if __name__ == "__main__":
-    SqliteDatabase('cards.db').create_tables([Card])
+
