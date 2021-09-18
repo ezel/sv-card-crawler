@@ -2,12 +2,11 @@ from peewee import *
 
 db = SqliteDatabase('cards.db')
 
-
 class Image(Model):
-    #card = ForeignKeyField(Card, null=True, field='card_id')
-    fname = CharField(primary_key=True)
+    #card = DeferredForeignKey('Card', null=True, field='card_id')
+    filename = CharField(primary_key=True)
     imageURL = CharField() # save the URL of image
-    imageLink = CharField() # save the local link of image
+    imagePath = CharField(null=True) # save the local path of image
     data = BlobField(null=True)
     compressed = BooleanField(default=False)
 
@@ -16,10 +15,31 @@ class Image(Model):
 
     @staticmethod
     def checkNotExist(fname):
-        if None == Image.get_or_none(fname=fname):
+        if None == Image.get_or_none(filename=filename):
             return True
         return False
 
+    @classmethod
+    def fromCrawler(cls, crawler):
+
+        def createImage(url):
+            fname = url.split('/')[-1].split('.')[0]
+            aImg = Image.get_or_none(filename=fname)
+            if aImg == None:
+                aImg = Image()
+                aImg.imageURL = url
+                aImg.filename = fname
+                aImg.save(force_insert=True)
+            return aImg
+
+        aImg1 = createImage(crawler.mainSoup[1][0])
+
+        if len(crawler.mainSoup[1]) > 1:
+            aImg2 = createImage(crawler.mainSoup[1][1])
+        else:
+            aImg2 = None
+
+        return aImg1, aImg2
 
 class Card(Model):
     card_id = CharField(primary_key=True)
@@ -46,12 +66,9 @@ class Card(Model):
         infoSoup = crawler.infoSoup
 
         # for image object
-        #fname =
+        aCard.img1, aCard.img2 = Image.fromCrawler(crawler)
 
-        # setter
-        aCard.img1 = mainSoup[1][0]
         if len(mainSoup[1]) > 1:
-            aCard.img2 = mainSoup[1][1]
             aCard.Atk2, aCard.HP2 = mainSoup[2][1]
         if mainSoup[2]:
             aCard.Atk1, aCard.HP1 = mainSoup[2][0]
@@ -140,5 +157,4 @@ class CardWrapper():
 
 def init_tables():
     db.create_tables([Card, CardLanguageInfo, Image])
-
-
+    #Image._schema.create_foreign_key(Image.card)

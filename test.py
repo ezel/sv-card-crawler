@@ -2,5 +2,6 @@ from module.cardCrawler import fetchSingleCard
 from module.model import CardWrapper, init_tables
 
 init_tables()
-x1 = fetchSingleCard("120631010")
-CardWrapper.importFromCrawler(x1)
+for cid in ['707034010', "120631010"]:
+    x1 = fetchSingleCard(cid)
+    CardWrapper.importFromCrawler(x1)
