@@ -1,12 +1,14 @@
 from peewee import *
+import os
+import requests
 
 db = SqliteDatabase('cards.db')
 
 class Image(Model):
     #card = DeferredForeignKey('Card', null=True, field='card_id')
     filename = CharField(primary_key=True)
-    imageURL = CharField() # save the URL of image
-    imagePath = CharField(null=True) # save the local path of image
+    imageURL = CharField() # save the origin URL of image
+    imagePath = CharField(null=True) # the path of image file, or image name if data save in db blob
     data = BlobField(null=True)
     compressed = BooleanField(default=False)
 
@@ -21,9 +23,8 @@ class Image(Model):
 
     @classmethod
     def fromCrawler(cls, crawler):
-
         def createImage(url):
-            fname = url.split('/')[-1].split('.')[0]
+            fname = url[url.rfind('/')+1:url.rfind('.')]
             aImg = Image.get_or_none(filename=fname)
             if aImg == None:
                 aImg = Image()
@@ -40,6 +41,28 @@ class Image(Model):
             aImg2 = None
 
         return aImg1, aImg2
+
+    def fetchImageFile(self, image_dir="images/"):
+        url = self.imageURL
+        save_name = url[url.rfind('/')+1:url.rfind('?')]
+        save_path = image_dir + save_name
+
+        # download from web
+        print('downloading %s...' % save_name)
+        img = requests.get(url)
+
+        with open(save_path, 'wb') as f:
+            f.write(img.content)
+        self.imagePath = save_path
+        return self.save()
+
+    def fetchImageData(self, compress):
+        url = self.imageURL
+        self.imagePath = url[url.rfind('/')+1:url.rfind('?')]
+        print('downloading %s...' % self.filename)
+        img = requests.get(self.imageURL)
+        self.data = img.content
+        return self.save()
 
 class Card(Model):
     card_id = CharField(primary_key=True)
@@ -121,11 +144,31 @@ class CardLanguageInfo(Model):
         else:
             aInfo.createInfo = int(infoSoup[3][1].replace(',',''))
         aInfo.liquefyInfo = infoSoup[4][1]
-        aInfo.cardPackInfo = infoSoup[5][1]
+        if len(infoSoup) > 6:
+            aInfo.cardPackInfo = infoSoup[6][1]
+        else:
+            aInfo.cardPackInfo = infoSoup[5][1]
         return aInfo
 
 
 class CardWrapper():
+    @staticmethod
+    def init_tables():
+        db.create_tables([Card, CardLanguageInfo, Image])
+        #Image._schema.create_foreign_key(Image.card)
+
+    @staticmethod
+    def init_directory(img_path="images"):
+        # create default dir
+        if not os.path.isdir(img_path):
+            try:
+                os.mkdir(img_path)
+            except OSError:
+                print ("Creation of the directory %s failed" % img_path)
+            else:
+                print ("Successfully created the directory %s " % img_path)
+
+
     @staticmethod
     def checkNotExist(cid, lang='en'):
         if None == Card.get_or_none(card_id=cid):
@@ -145,16 +188,12 @@ class CardWrapper():
             mainCard.save(force_insert=True)
 
         # new lang info
-        mainInfo = CardLanguageInfo.get_or_none(crawler.cid, language=crawler.lang)
+        mainInfo = CardLanguageInfo.get_or_none(card_id=crawler.cid, language=crawler.lang)
         if None == mainInfo:
             mainInfo = CardLanguageInfo.fromCrawler(crawler)
-            mainInfo.save()
+            mainInfo.save(force_insert=True)
 
         # sub cards
         for subCrawler in crawler.relativeSoup:
             CardWrapper.importFromCrawler(subCrawler, mainCard)
 
-
-def init_tables():
-    db.create_tables([Card, CardLanguageInfo, Image])
-    #Image._schema.create_foreign_key(Image.card)

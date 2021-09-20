@@ -1,7 +1,6 @@
 from module.listCrawler import getCardList
 from module.cardCrawler import fetchSingleCard
-from module.imageCrawler import updateCardImage, init_directory
-from module.model import CardWrapper, init_tables
+from module.model import CardWrapper
 from concurrent.futures import ThreadPoolExecutor
 
 import argparse
@@ -24,7 +23,7 @@ if __name__ == "__main__":
 
     # fetch data by multi-threads
     # fetch card data
-    init_tables()
+    CardWrapper.init_tables()
     download_count = 0
     with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
         for cid in currentList:
@@ -37,7 +36,7 @@ if __name__ == "__main__":
     print('Finish fetching Card, %d images need to download.' % download_count)
     print('Start downloading images...')
 
-    init_directory()
+    CardWrapper.init_directory()
     exit()
     with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
          for c in Card.select().where( Card.imageLink1 == None ):
