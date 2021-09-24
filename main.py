@@ -6,9 +6,9 @@ from concurrent.futures import ThreadPoolExecutor
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--mode", type=int, choices=[1,3], default=1,
+parser.add_argument("mode", type=int, choices=[1,3], default=1,
                     help="game mode: 1=Rotation, 3=Unlimit, default=1")
-parser.add_argument("-l", "--language", type=str, choices=['en','ja','zh-tw'], default='zh-tw',
+parser.add_argument("language", type=str, choices=['en','ja','zh-tw'], default='zh-tw',
                     help="card language: default=zh-tw")
 parser.add_argument("-w","--maxWorkers", type=int, default=20,
                     help="the max concurrent workers when downling images, default=20")
@@ -35,7 +35,7 @@ if __name__ == "__main__":
                 # newCard = future.result()
 
     # download images
-    print('Finish fetching %n Card info, check the images need to download.' % download_count)
+    print('Finish fetching %s Card info, check the images need to download.' % download_count)
     print('Start downloading images...')
 
     if (args.save == 2):

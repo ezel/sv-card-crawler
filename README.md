@@ -15,29 +15,26 @@ this will generate a cards.db file for sqlite3
 ```
 
 ```cmd
-usage: main.py [-h] [-w MAXWORKERS] [-f] {1,3} {en,ja,zh-tw}
+usage: main.py [-h] [-w MAXWORKERS] [-f] [-s {1,2}] {1,3} {en,ja,zh-tw}
 
 positional arguments:
   {1,3}                 game mode: 1=Rotation, 3=Unlimit, default=1
   {en,ja,zh-tw}         card language: default=zh-tw
 
 optional arguments:
-  -h, --help            show this help message
+  -h, --help            show this help message and exit
   -w MAXWORKERS, --maxWorkers MAXWORKERS
-                        the max concurrent workers when downling images
-  -f, --forceFetch      wheather fetch from web or use local temp file
-
+                        the max concurrent workers when downling images, default=20
+  -f, --forceFetch      if set, always fetch the whole list from web
+  -s {1,2}, --save {1,2}
+                        save images in: 1=database, 2=file in a directory, default=1
 ```
 
-## Generated card schema
-```sql
-CREATE TABLE IF NOT EXISTS "card" ("id" INTEGER NOT NULL PRIMARY KEY, "cid" VARCHAR(255) NOT NULL, "language" VARCHAR(255) NOT NULL, "title" VARCHAR(255) NOT NULL, "imageURL1" VARCHAR(255) NOT NULL, "imageURL2" VARCHAR(255), "imageLink1" VARCHAR(255), "imageLink2" VARCHAR(255), "Atk1" INTEGER, "HP1" INTEGER, "Atk2" INTEGER, "HP2" INTEGER, "minCost" INTEGER, "skill1" TEXT NOT NULL, "skill2" TEXT, "desp1" TEXT NOT NULL, "desp2" TEXT, "traitInfo" VARCHAR(255) NOT NULL, "classInfo" VARCHAR(255) NOT NULL, "rarityInfo" VARCHAR(255) NOT NULL, "createInfo" INTEGER NOT NULL, "liquefyInfo" VARCHAR(255) NOT NULL, "cardPackInfo" VARCHAR(255) NOT NULL, "mainCard_id" INTEGER, FOREIGN KEY ("mainCard_id") REFERENCES "card" ("id"));
-```
+
 
 
 ## TODO
 
-* ~~a gui to view card [maybe in a new project]~~
-* a better UX usage
-* compress/resize images
-* store images in database
+* ~~a gui to view card~~ [will in a new project]
+* ~~compress/resize images~~ [abandon]
+* ~~store images in database~~
