@@ -13,7 +13,9 @@ parser.add_argument("-l", "--language", type=str, choices=['en','ja','zh-tw'], d
 parser.add_argument("-w","--maxWorkers", type=int, default=20,
                     help="the max concurrent workers when downling images, default=20")
 parser.add_argument("-f","--forceFetch", action="store_true",
-                    help="if set, will fetch a list from web")
+                    help="if set, always fetch the whole list from web")
+parser.add_argument("-s", "--save", type=int, choices=[1,2], default=1,
+                    help="save images in: 1=database, 2=the image directory")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -39,6 +41,6 @@ if __name__ == "__main__":
     CardWrapper.init_directory()
     exit()
     with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
-         for c in Card.select().where( Card.imageLink1 == None ):
-             future = executor.submit(updateCardImage, c)
+         for img in CardWrapper.ImagesWithoutData():
+             future = executor.submit(CardWrapper.updateImage, img)
     print('Complete downloading images.')

@@ -8,7 +8,6 @@ for cid in ['707034010', "120631010"]:
         CardWrapper.importFromCrawler(x1)
 
 CardWrapper.init_directory()
-img1 = Image.get_or_none(filename='C_109034010')
-img1.fetchImageFile()
-img2 = Image.get_or_none(filename='C_707034010')
-img2.fetchImageData(1)
+
+for i in CardWrapper.ImagesWithoutData():
+    CardWrapper.updateImage(i)

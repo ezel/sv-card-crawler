@@ -56,7 +56,7 @@ class Image(Model):
         self.imagePath = save_path
         return self.save()
 
-    def fetchImageData(self, compress):
+    def fetchImageData(self, compress=False):
         url = self.imageURL
         self.imagePath = url[url.rfind('/')+1:url.rfind('?')]
         print('downloading %s...' % self.filename)
@@ -197,3 +197,17 @@ class CardWrapper():
         for subCrawler in crawler.relativeSoup:
             CardWrapper.importFromCrawler(subCrawler, mainCard)
 
+
+    @staticmethod
+    def ImagesWithoutData():
+        for i in Image.select().where(Image.imagePath == None):
+            yield i
+
+    @staticmethod
+    def updateImage(image, save_mode=1):
+        if save_mode==1:
+            image.fetchImageData()
+        elif save_mode==2:
+            image.fetchImageFile()
+        else:
+            return False
