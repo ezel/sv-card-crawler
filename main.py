@@ -35,12 +35,13 @@ if __name__ == "__main__":
                 # newCard = future.result()
 
     # download images
-    print('Finish fetching Card, %d images need to download.' % download_count)
+    print('Finish fetching %n Card info, check the images need to download.' % download_count)
     print('Start downloading images...')
 
-    CardWrapper.init_directory()
-    exit()
+    if (args.save == 2):
+        CardWrapper.init_directory()
+
     with ThreadPoolExecutor(max_workers=args.maxWorkers) as executor:
          for img in CardWrapper.ImagesWithoutData():
-             future = executor.submit(CardWrapper.updateImage, img)
+             future = executor.submit(CardWrapper.updateImage, img, args.save)
     print('Complete downloading images.')
